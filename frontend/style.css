@@ -1,0 +1,1223 @@
+/* ==========================================================================
+   Financial Flight Simulator — Avionics Dashboard Theme
+   Palette: near-black cockpit glass, amber + cyan instrument accents.
+   -------------------------------------------------------------------------
+   --bg:        #0A0E13   deep cockpit black
+   --panel:     #121821   instrument panel
+   --panel-2:   #171F2B   raised panel
+   --border:    #232E3D   hairline bezel
+   --ink:       #E7EEF5   primary readout text
+   --muted:     #7C8CA0   secondary label text
+   --amber:     #F5A623   caution / primary accent
+   --cyan:      #38C6F4   primary data / recommended path
+   --green:     #34D399   safe
+   --yellow:    #FBBF24   warning
+   --red:       #F8695F   critical
+   ========================================================================== */
+
+:root {
+  --bg: #0A0E13;
+  --panel: #121821;
+  --panel-2: #171F2B;
+  --border: #232E3D;
+  --ink: #E7EEF5;
+  --muted: #7C8CA0;
+  --amber: #F5A623;
+  --cyan: #38C6F4;
+  --green: #34D399;
+  --yellow: #FBBF24;
+  --red: #F8695F;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --display: 'Space Grotesk', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--display);
+  min-height: 100vh;
+}
+
+body {
+  background-image:
+    radial-gradient(circle at 15% 0%, rgba(56, 198, 244, 0.06), transparent 40%),
+    radial-gradient(circle at 85% 10%, rgba(245, 166, 35, 0.05), transparent 40%);
+  position: relative;
+}
+
+/* ---------- Topbar ---------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 32px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, #0D1219 0%, #0A0E13 100%);
+}
+
+.brand { display: flex; align-items: center; gap: 14px; }
+
+.brand-glyph {
+  font-size: 24px;
+  color: var(--cyan);
+  display: inline-block;
+  text-shadow: 0 0 12px rgba(56,198,244,0.5);
+}
+
+.brand-text h1 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.brand-text p {
+  margin: 2px 0 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
+.field-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+.profile-select {
+  background: var(--panel-2);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-family: var(--mono);
+  font-size: 13px;
+  min-width: 240px;
+}
+
+/* ---------- Deck / layout ---------- */
+.deck {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 32px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px 22px;
+  position: relative;
+}
+
+.panel::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 14px; right: 14px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56,198,244,0.35), transparent);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.panel-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.panel-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  background: rgba(52, 211, 153, 0.12);
+  color: var(--green);
+  letter-spacing: 1px;
+}
+.panel-sub.warn { background: rgba(251,191,36,0.14); color: var(--yellow); }
+.panel-sub.crit { background: rgba(248,105,95,0.14); color: var(--red); }
+
+/* ---------- Instrument row ---------- */
+.instrument-row {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 22px;
+}
+
+.gauge-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.gauge-svg { width: 100%; max-width: 280px; }
+
+.gauge-readout {
+  margin-top: -34px;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--mono);
+}
+
+#runwayValue {
+  font-size: 34px;
+  font-weight: 600;
+  color: var(--cyan);
+  text-shadow: 0 0 16px rgba(56,198,244,0.4);
+}
+
+.gauge-unit {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.stat {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.profile-desc {
+  margin: 14px 2px 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ---------- Adjust Your Business — live sliders ---------- */
+.sliders-panel .panel-header {
+  align-items: center;
+}
+
+.reset-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.reset-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+.slider-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 28px;
+}
+
+.slider-row { display: flex; flex-direction: column; gap: 8px; }
+
+.slider-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.slider-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.slider-value {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cyan);
+}
+
+.slider-track-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slider-step {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.slider-step:hover { border-color: var(--amber); color: var(--amber); }
+
+.slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--border);
+  outline: none;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px rgba(56,198,244,0.5);
+  cursor: pointer;
+  border: 2px solid #0A0E13;
+}
+
+.slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px rgba(56,198,244,0.5);
+  cursor: pointer;
+  border: 2px solid #0A0E13;
+}
+
+/* ---------- Extra graphical representations row ---------- */
+.chart-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 22px;
+}
+
+/* ---------- Chart containers ----------
+   Chart.js (responsive:true, maintainAspectRatio:false) reads its render
+   size from this wrapper, not from the canvas's own width/height
+   attributes. Giving every chart a dedicated box with an explicit CSS
+   height — instead of letting the canvas share a panel with headers/
+   legends/text that can change size — keeps the box Chart.js measures
+   stable, so the canvas's backing-store resolution and its on-screen CSS
+   size stay in sync (no resampling => no blur). */
+.chart-container {
+  position: relative;
+  width: 100%;
+}
+.chart-container canvas {
+  /* Chart.js manages the actual width/height + backing store; this just
+     stops the canvas from ever being stretched past its container. */
+  max-width: 100%;
+}
+
+.chart-container-medium { height: 260px; }
+.chart-container-large { height: 300px; }
+.chart-container-small { height: 210px; }
+
+/* ---------- Monte Carlo stress test (FEATURE 3) ---------- */
+.confidence-badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+  background: rgba(56,198,244,0.12);
+  color: var(--cyan);
+  white-space: nowrap;
+}
+.confidence-badge.safe { background: rgba(52, 211, 153, 0.14); color: var(--green); }
+.confidence-badge.warn { background: rgba(251,191,36,0.14); color: var(--yellow); }
+.confidence-badge.crit { background: rgba(248,105,95,0.14); color: var(--red); }
+
+.mc-explainer {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0 0 16px;
+}
+.mc-explainer strong { color: var(--ink); font-weight: 600; }
+.mc-explainer .mc-headline-safe { color: var(--green); font-weight: 600; }
+.mc-explainer .mc-headline-warn { color: var(--yellow); font-weight: 600; }
+.mc-explainer .mc-headline-crit { color: var(--red); font-weight: 600; }
+
+.mc-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.mc-legend-item { display: flex; align-items: center; gap: 7px; }
+.mc-swatch { width: 22px; height: 10px; border-radius: 3px; display: inline-block; }
+.mc-swatch-outer { background: rgba(56,198,244,0.18); border: 1px solid rgba(56,198,244,0.35); }
+.mc-swatch-inner { background: rgba(56,198,244,0.4); }
+.mc-swatch-median { background: var(--cyan); height: 3px; border-radius: 2px; }
+
+.mc-footnote {
+  margin: 12px 2px 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.composition-legend {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 10px;
+  justify-content: center;
+}
+
+/* ---------- Console ---------- */
+.console-form {
+  display: flex;
+  gap: 10px;
+}
+
+#whatifInput {
+  flex: 1;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 13px 16px;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#whatifInput:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(56,198,244,0.12);
+}
+
+#submitBtn {
+  background: var(--amber);
+  color: #201404;
+  border: none;
+  border-radius: 8px;
+  padding: 0 22px;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+#submitBtn:hover { box-shadow: 0 0 16px rgba(245,166,35,0.45); }
+#submitBtn:active { transform: scale(0.97); }
+#submitBtn:disabled { opacity: 0.6; cursor: wait; }
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.chip {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 7px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chip:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.chip-compound, .chip-breakeven {
+  border-style: dashed;
+}
+.chip-compound:hover { border-color: var(--amber); color: var(--amber); }
+.chip-breakeven:hover { border-color: var(--green); color: var(--green); }
+
+.engine-note {
+  margin: 16px 2px 0;
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.5;
+  font-family: var(--mono);
+}
+
+#llmTag { color: var(--amber); }
+
+/* ---------- Safe Limits panel (reverse simulation) ---------- */
+.safe-limits-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.safe-limit-card {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.safe-limit-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.safe-limit-value {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--green);
+  text-shadow: 0 0 12px rgba(52,211,153,0.3);
+}
+
+.safe-limit-note {
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* ---------- Mode toggle (What if / What should I do) ---------- */
+.mode-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.mode-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mode-btn.active {
+  background: rgba(56,198,244,0.12);
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.mode-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+.icon-btn {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  border-radius: 8px;
+  width: 54px;
+  min-width: 54px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+.icon-btn svg { width: 24px; height: 24px; }
+.icon-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+.icon-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.icon-btn.recording { background: rgba(248,105,95,0.16); border-color: var(--red); color: var(--red); animation: pulseRec 1s infinite; }
+
+/* Mic button — sized up slightly from the base icon-btn so it reads
+   clearly next to the input/Run Scenario button, with a bolder stroke
+   on the glyph itself rather than just scaling the outer box. */
+.icon-btn-mic {
+  width: 60px;
+  min-width: 60px;
+}
+.icon-btn-mic svg { width: 26px; height: 26px; }
+
+@keyframes pulseRec {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(248,105,95,0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(248,105,95,0); }
+}
+
+/* ---------- Document upload ---------- */
+.document-upload {
+  margin-top: 14px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+.document-upload summary {
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--muted);
+  outline: none;
+}
+.document-upload summary:hover { color: var(--cyan); }
+
+.document-upload-body {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.document-upload-body textarea {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  resize: vertical;
+}
+
+.document-upload-body input[type="file"] {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+#extractBtn {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 7px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+#extractBtn:hover { background: rgba(56,198,244,0.12); }
+
+.extract-result {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--green);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ---------- Decision trace / auditability ---------- */
+.decision-trace {
+  margin: 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.decision-trace li {
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.decision-trace .trace-key {
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-weight: 600;
+}
+
+.decision-trace .trace-detail {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+/* ---------- Results ---------- */
+.results-section {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.results-section.hidden, .empty-state.hidden { display: none; }
+.hidden { display: none !important; }
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 13px;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.legend-swatch {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.legend-item.recommended { color: var(--ink); font-weight: 600; }
+
+/* ---------- Risk strip ---------- */
+.risk-strip {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 6px;
+}
+
+.risk-cell {
+  border-radius: 6px;
+  padding: 10px 4px 8px;
+  text-align: center;
+  font-family: var(--mono);
+  border: 1px solid var(--border);
+}
+
+.risk-cell .m-label {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.risk-cell .m-status {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.risk-cell.safe { background: rgba(52,211,153,0.10); }
+.risk-cell.safe .m-status { color: var(--green); }
+.risk-cell.warning { background: rgba(251,191,36,0.12); }
+.risk-cell.warning .m-status { color: var(--yellow); }
+.risk-cell.critical { background: rgba(248,105,95,0.14); }
+.risk-cell.critical .m-status { color: var(--red); }
+
+/* ---------- Clearance / recommendation ---------- */
+.clearance-body {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.clearance-badge {
+  flex-shrink: 0;
+  background: rgba(56,198,244,0.12);
+  color: var(--cyan);
+  border: 1px solid rgba(56,198,244,0.35);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.explanation-text {
+  margin: 0;
+  line-height: 1.6;
+  font-size: 14.5px;
+  color: var(--ink);
+}
+
+.scenario-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.scenario-card {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.scenario-card.is-recommended {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 1px rgba(56,198,244,0.25), 0 0 18px rgba(56,198,244,0.08);
+}
+
+.scenario-card h4 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.scenario-card .tag {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--cyan);
+  border: 1px solid rgba(56,198,244,0.4);
+  padding: 1px 7px;
+  border-radius: 20px;
+}
+
+.scenario-card .tag-compound {
+  color: var(--amber);
+  border-color: rgba(245,166,35,0.4);
+}
+
+.scenario-card p {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.scenario-card .metric-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 4px 0;
+  border-top: 1px dashed var(--border);
+}
+
+.scenario-card .metric-row span:last-child { color: var(--ink); font-weight: 600; }
+
+/* ---------- Break-even / safe-zone callout (FEATURE 2) ----------
+   Deliberately distinct from scenario cards: green-accented, icon-led,
+   a direct answer rather than a comparison. */
+.breakeven-panel {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  border-color: rgba(52,211,153,0.35);
+  background: linear-gradient(135deg, rgba(52,211,153,0.07), var(--panel) 60%);
+}
+
+.breakeven-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(52,211,153,0.4);
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.breakeven-body { flex: 1; }
+
+.breakeven-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: var(--green);
+  text-transform: uppercase;
+}
+
+.breakeven-text {
+  margin: 6px 0 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.breakeven-text strong { color: var(--green); }
+
+.breakeven-caveat {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+
+/* ---------- Sensitivity analysis panel (FEATURE 1) ---------- */
+/* Sizing now comes from .chart-container-small on the wrapper div, so the
+   chart's render box stays in sync with its actual CSS size (see the
+   .chart-container rules above). */
+
+.sensitivity-note {
+  margin: 12px 2px 0;
+  font-size: 11.5px;
+  color: var(--muted);
+  font-family: var(--mono);
+}
+
+/* ---------- Footer ---------- */
+.footer {
+  text-align: center;
+  padding: 24px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  .instrument-row { grid-template-columns: 1fr; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .risk-strip { grid-template-columns: repeat(6, 1fr); }
+  .topbar { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .breakeven-panel { flex-direction: column; }
+  .slider-grid { grid-template-columns: 1fr; }
+  .chart-row { grid-template-columns: 1fr; }
+  .risk-cards-grid { grid-template-columns: 1fr; }
+  .risk-radar-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .protective-actions { grid-template-columns: 1fr; }
+}
+
+/* focus visibility */
+button:focus-visible, select:focus-visible, input:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* =========================================================================
+   FINANCIAL RISK RADAR
+   ========================================================================= */
+.risk-radar-header {
+  align-items: flex-start;
+}
+
+.risk-radar-subtitle {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.financial-health {
+  position: relative;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.financial-health-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.financial-health-score {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--green);
+  cursor: pointer;
+  text-shadow: 0 0 12px rgba(52,211,153,0.25);
+  transition: all 0.15s ease;
+}
+.financial-health-score:hover { border-color: var(--cyan); color: var(--cyan); }
+.financial-health-score.score-watch { color: var(--yellow); text-shadow: 0 0 12px rgba(251,191,36,0.25); }
+.financial-health-score.score-medium { color: var(--amber); text-shadow: 0 0 12px rgba(245,166,35,0.25); }
+.financial-health-score.score-high { color: var(--red); text-shadow: 0 0 12px rgba(248,105,95,0.25); }
+
+.financial-health-breakdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 20;
+  width: 280px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  text-align: left;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink);
+}
+
+.financial-health-breakdown .breakdown-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  color: var(--muted);
+}
+.financial-health-breakdown .breakdown-line.total {
+  border-top: 1px solid var(--border);
+  margin-top: 6px;
+  padding-top: 8px;
+  color: var(--ink);
+  font-weight: 700;
+}
+.financial-health-breakdown .breakdown-line span:last-child { color: var(--ink); }
+
+.risk-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px;
+}
+
+.risk-card {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  border-left: 3px solid var(--border);
+}
+.risk-card.sev-high { border-left-color: var(--red); box-shadow: 0 0 18px rgba(248,105,95,0.06); }
+.risk-card.sev-medium { border-left-color: var(--amber); }
+.risk-card.sev-watch { border-left-color: var(--yellow); }
+.risk-card.sev-healthy { border-left-color: var(--green); }
+
+.risk-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.risk-badge {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.8px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.risk-badge.sev-high { background: rgba(248,105,95,0.14); color: var(--red); }
+.risk-badge.sev-medium { background: rgba(245,166,35,0.14); color: var(--amber); }
+.risk-badge.sev-watch { background: rgba(251,191,36,0.14); color: var(--yellow); }
+.risk-badge.sev-healthy { background: rgba(52,211,153,0.14); color: var(--green); }
+
+.risk-info-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.risk-info-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+.risk-card-title {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.6px;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+
+.risk-card-value {
+  font-family: var(--mono);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.risk-card-summary {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.risk-card-demo-tag {
+  align-self: flex-start;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.6px;
+  color: var(--cyan);
+  border: 1px dashed var(--cyan);
+  border-radius: 12px;
+  padding: 1px 7px;
+  opacity: 0.85;
+}
+
+.risk-card-tooltip {
+  background: rgba(10,14,19,0.55);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.risk-card-tooltip strong { color: var(--ink); }
+
+.risk-card-simulate {
+  margin-top: auto;
+  align-self: flex-start;
+  background: transparent;
+  border: none;
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.risk-card-simulate:hover { text-decoration: underline; }
+
+.protect-business-wrap {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.protect-business-btn {
+  background: linear-gradient(135deg, rgba(56,198,244,0.16), rgba(52,211,153,0.10));
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 1.2px;
+  font-weight: 600;
+  padding: 12px 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.protect-business-btn:hover { box-shadow: 0 0 20px rgba(56,198,244,0.2); }
+.protect-business-btn:disabled { opacity: 0.6; cursor: default; }
+
+.protective-actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.protective-action-card {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.protective-action-card h4 {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.protective-action-card p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.protective-action-impact {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--green);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.protective-action-apply {
+  margin-top: 4px;
+  align-self: flex-start;
+  background: transparent;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.protective-action-apply:hover { background: rgba(56,198,244,0.1); }

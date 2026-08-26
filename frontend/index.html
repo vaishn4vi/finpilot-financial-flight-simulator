@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FinPilot — AI Financial Controller</title>
+<meta name="theme-color" content="#0A0E13" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icon-192.png" type="image/png" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="brand">
+      <span class="brand-glyph">◈</span>
+      <div class="brand-text">
+        <h1>FinPilot</h1>
+        <p>FinPilot — AI Financial Controller</p>
+      </div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <label for="profileSelect" class="field-label">BUSINESS PROFILE</label>
+    <select id="profileSelect" class="profile-select"></select>
+  </div>
+</header>
+
+<main class="deck">
+
+  <!-- Instrument row -->
+  <section class="instrument-row">
+    <div class="panel gauge-panel">
+      <div class="panel-header">
+        <span class="panel-title">RUNWAY</span>
+        <span class="panel-sub" id="runwayStatusTag">SAFE</span>
+      </div>
+      <div class="gauge-wrap">
+        <svg id="runwayGauge" viewBox="0 0 240 150" class="gauge-svg"></svg>
+        <div class="gauge-readout">
+          <span id="runwayValue">--</span>
+          <span class="gauge-unit">months</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel stats-panel">
+      <div class="panel-header"><span class="panel-title">CURRENT INSTRUMENTS</span></div>
+      <div class="stat-grid">
+        <div class="stat">
+          <span class="stat-label">Cash on hand</span>
+          <span class="stat-value" id="statCash">--</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Monthly revenue</span>
+          <span class="stat-value" id="statRevenue">--</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Monthly burn</span>
+          <span class="stat-value" id="statBurn">--</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Growth rate</span>
+          <span class="stat-value" id="statGrowth">--</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Payment terms</span>
+          <span class="stat-value" id="statTerms">--</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Payroll headcount cost</span>
+          <span class="stat-value" id="statPayroll">--</span>
+        </div>
+      </div>
+      <p class="profile-desc" id="profileDesc"></p>
+    </div>
+  </section>
+
+  <!-- FINANCIAL RISK RADAR — proactive, always-on risk detection. Populated
+       from GET /api/risk-radar/:profileId (100% deterministic — see
+       engine.js analyzeRisks()). Refreshes whenever the profile or live
+       sliders change, same pattern as the Safe Limits panel below. -->
+  <section class="panel risk-radar-panel">
+    <div class="panel-header risk-radar-header">
+      <div>
+        <span class="panel-title">FINANCIAL RISK RADAR</span>
+        <p class="risk-radar-subtitle">Proactive warnings before they become financial problems.</p>
+      </div>
+      <div class="financial-health" id="financialHealthWrap">
+        <span class="financial-health-label">FINANCIAL HEALTH</span>
+        <button type="button" class="financial-health-score" id="financialHealthScore">-- / 100</button>
+        <div class="financial-health-breakdown hidden" id="financialHealthBreakdown"></div>
+      </div>
+    </div>
+    <div class="risk-cards-grid" id="riskCardsGrid">
+      <!-- risk cards injected by app.js -->
+    </div>
+    <div class="protect-business-wrap">
+      <button type="button" id="protectBusinessBtn" class="protect-business-btn">PROTECT MY BUSINESS</button>
+      <div id="protectiveActions" class="protective-actions hidden"></div>
+    </div>
+  </section>
+
+  <!-- SAFE LIMITS — always-on reverse-simulation summary. Computed via
+       engine.findSafeThreshold() for hiring headcount AND revenue-drop
+       tolerance, binary-searched against the CURRENT (possibly
+       slider-adjusted) numbers. Updates whenever the profile or sliders
+       change — no need to phrase a boundary question in free text. -->
+  <section class="panel safe-limits-panel">
+    <div class="panel-header">
+      <span class="panel-title">SAFE LIMITS — REVERSE SIMULATION</span>
+      <span class="panel-sub" id="safeLimitsTarget">6-MO RUNWAY TARGET</span>
+    </div>
+    <div class="safe-limits-grid" id="safeLimitsGrid">
+      <div class="safe-limit-card">
+        <span class="safe-limit-label">Maximum safe hiring</span>
+        <span class="safe-limit-value" id="safeHireValue">--</span>
+        <span class="safe-limit-note" id="safeHireNote"></span>
+      </div>
+      <div class="safe-limit-card">
+        <span class="safe-limit-label">Maximum tolerable revenue drop</span>
+        <span class="safe-limit-value" id="safeRevenueValue">--</span>
+        <span class="safe-limit-note" id="safeRevenueNote"></span>
+      </div>
+      <div class="safe-limit-card">
+        <span class="safe-limit-label">Minimum safe cash balance</span>
+        <span class="safe-limit-value" id="safeMinCashValue">--</span>
+        <span class="safe-limit-note">2× current monthly burn — the level that flips a month to "warning"</span>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Adjust Your Business — live sliders for income, costs, payroll, growth.
+       These feed into EVERY endpoint (baseline, what-if, sensitivity,
+       breakeven) via the `overrides` payload, so dragging "Monthly Income"
+       up or down live-updates the gauge, the two charts below, and any
+       what-if question you go on to ask. -->
+  <section class="panel sliders-panel">
+    <div class="panel-header">
+      <span class="panel-title">ADJUST YOUR BUSINESS — LIVE CONTROLS</span>
+      <button type="button" id="resetSlidersBtn" class="reset-btn">Reset to defaults</button>
+    </div>
+    <div class="slider-grid">
+      <div class="slider-row">
+        <div class="slider-label-row">
+          <span class="slider-label">Monthly Income</span>
+          <span class="slider-value" id="sliderRevenueValue">--</span>
+        </div>
+        <div class="slider-track-row">
+          <button type="button" class="slider-step" data-slider="monthlyRevenue" data-dir="-1">−</button>
+          <input type="range" id="sliderRevenue" class="slider" min="0" max="100" step="1" />
+          <button type="button" class="slider-step" data-slider="monthlyRevenue" data-dir="1">+</button>
+        </div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label-row">
+          <span class="slider-label">Growth Rate</span>
+          <span class="slider-value" id="sliderGrowthValue">--</span>
+        </div>
+        <div class="slider-track-row">
+          <button type="button" class="slider-step" data-slider="growthRate" data-dir="-1">−</button>
+          <input type="range" id="sliderGrowth" class="slider" min="-5" max="15" step="0.5" />
+          <button type="button" class="slider-step" data-slider="growthRate" data-dir="1">+</button>
+        </div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label-row">
+          <span class="slider-label">Fixed Costs</span>
+          <span class="slider-value" id="sliderFixedValue">--</span>
+        </div>
+        <div class="slider-track-row">
+          <button type="button" class="slider-step" data-slider="monthlyFixedCosts" data-dir="-1">−</button>
+          <input type="range" id="sliderFixed" class="slider" min="0" max="100" step="1" />
+          <button type="button" class="slider-step" data-slider="monthlyFixedCosts" data-dir="1">+</button>
+        </div>
+      </div>
+      <div class="slider-row">
+        <div class="slider-label-row">
+          <span class="slider-label">Payroll</span>
+          <span class="slider-value" id="sliderPayrollValue">--</span>
+        </div>
+        <div class="slider-track-row">
+          <button type="button" class="slider-step" data-slider="monthlyPayroll" data-dir="-1">−</button>
+          <input type="range" id="sliderPayroll" class="slider" min="0" max="100" step="1" />
+          <button type="button" class="slider-step" data-slider="monthlyPayroll" data-dir="1">+</button>
+        </div>
+      </div>
+    </div>
+    <p class="engine-note" id="overrideNote"></p>
+  </section>
+
+  <!-- Extra graphical representations — always-on visuals for the CURRENT
+       (possibly slider-adjusted) baseline, independent of running a
+       what-if question. -->
+  <section class="chart-row">
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">REVENUE VS COSTS — 12 MONTH FORECAST</span></div>
+      <div class="chart-container chart-container-medium">
+        <canvas id="revenueCostChart"></canvas>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">COST COMPOSITION — THIS MONTH</span></div>
+      <div class="chart-container chart-container-medium">
+        <canvas id="compositionChart"></canvas>
+      </div>
+      <div id="compositionLegend" class="chart-legend composition-legend"></div>
+    </div>
+  </section>
+
+  <!-- FEATURE 3 — Monte Carlo stress test, always-on for the CURRENT
+       (possibly slider-adjusted) baseline. The "Revenue vs Costs" chart
+       above shows ONE deterministic line, as if the future were certain.
+       This runs that same forecast hundreds of times with realistic
+       swings in growth, demand, costs, and payment timing, and shows the
+       actual SPREAD of plausible outcomes plus a plain "how likely is
+       this to go fine" number. -->
+  <section class="panel montecarlo-panel">
+    <div class="panel-header">
+      <span class="panel-title">CASH FLOW CONFIDENCE — MONTE CARLO STRESS TEST</span>
+      <span class="confidence-badge" id="mcBaselineBadge">--</span>
+    </div>
+    <p class="mc-explainer">
+      We ran your 12-month forecast <strong id="mcBaselineTrials">400</strong> times, each time with realistic,
+      randomized swings in growth rate, month-to-month demand, fixed-cost overruns, and a chance of a customer
+      paying late — instead of assuming next year plays out exactly on the single line above.
+      <span id="mcBaselineHeadline"></span>
+    </p>
+    <div class="chart-container chart-container-large">
+      <canvas id="mcBaselineChart"></canvas>
+    </div>
+    <div class="mc-legend">
+      <div class="mc-legend-item"><span class="mc-swatch mc-swatch-outer"></span>80% of outcomes fall in this range</div>
+      <div class="mc-legend-item"><span class="mc-swatch mc-swatch-inner"></span>50% of outcomes fall in this range</div>
+      <div class="mc-legend-item"><span class="mc-swatch mc-swatch-median"></span>Median (most likely) path</div>
+    </div>
+    <p class="mc-footnote" id="mcBaselineFootnote"></p>
+  </section>
+
+  <!-- AI Financial Controller console -->
+  <section class="panel console-panel">
+    <div class="panel-header"><span class="panel-title">ASK YOUR AI FINANCIAL CONTROLLER</span></div>
+
+    <div class="mode-toggle" id="modeToggle">
+      <button type="button" class="mode-btn active" data-mode="whatif">What if…?</button>
+      <button type="button" class="mode-btn" data-mode="decide">What should I do?</button>
+    </div>
+
+    <form id="whatifForm" class="console-form">
+      <input
+        id="whatifInput"
+        type="text"
+        placeholder="e.g. what if I hire 10 employees this quarter?"
+        autocomplete="off"
+      />
+      <button type="button" id="micBtn" class="icon-btn icon-btn-mic" title="Ask by voice" aria-label="Ask by voice">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </button>
+      <button type="submit" id="submitBtn">Run Scenario</button>
+    </form>
+
+    <p id="decideNote" class="engine-note hidden">
+      "What should I do?" runs your CURRENT numbers (profile + any slider adjustments above) through six deterministic
+      turnaround levers — cost cuts, hiring freeze, pricing, sales investment, and a combination — and ranks them by outcome. No question text needed.
+    </p>
+
+    <div class="chip-row" id="exampleChips">
+      <button class="chip" data-q="What if I hire 10 employees?">Hire 10 employees</button>
+      <button class="chip" data-q="What if my biggest customer pays 15 days late?">Customer pays 15 days late</button>
+      <button class="chip" data-q="What if revenue drops 20%?">Revenue drops 20%</button>
+      <button class="chip" data-q="What if revenue grows 15%?">Revenue grows 15%</button>
+      <button class="chip chip-compound" data-q="What if I hire 10 people and my biggest customer pays 30 days late?">Hire 10 + customer pays late (compound)</button>
+      <button class="chip chip-breakeven" data-q="How many employees can I afford to hire?">How many can I afford to hire? (breakeven)</button>
+    </div>
+
+    <details class="document-upload">
+      <summary>📄 Upload financial document (CSV / plain text) — auto-fill your numbers</summary>
+      <div class="document-upload-body">
+        <input type="file" id="docFileInput" accept=".csv,.txt" />
+        <textarea id="docTextInput" rows="3" placeholder="Or paste figures directly, e.g.&#10;Revenue: ₹18.4L&#10;Payroll: ₹7.2L&#10;Operating costs: ₹5.8L&#10;Cash: ₹24.6L"></textarea>
+        <button type="button" id="extractBtn">Extract &amp; apply to simulation</button>
+        <p id="extractResult" class="extract-result"></p>
+      </div>
+    </details>
+
+    <p class="engine-note">Parsing &amp; explanation may use an LLM if configured — every number on this screen is computed by the deterministic engine, never generated by a model. <span id="llmTag"></span></p>
+  </section>
+
+  <!-- Results -->
+  <section id="resultsSection" class="results-section hidden">
+
+    <!-- FEATURE 2 — Break-even / safe-zone callout. Only shown when the
+         question was detected as a boundary question ("how many can I
+         afford"). Deliberately styled differently from scenario cards —
+         this is a direct answer, not a comparison. -->
+    <div id="breakevenPanel" class="panel breakeven-panel hidden">
+      <div class="breakeven-icon">◎</div>
+      <div class="breakeven-body">
+        <span class="breakeven-label">SAFE ZONE FOUND</span>
+        <p id="breakevenText" class="breakeven-text"></p>
+      </div>
+    </div>
+
+    <div class="panel chart-panel">
+      <div class="panel-header">
+        <span class="panel-title">STRATEGY COMPARISON — 12 MONTH CASH PROJECTION</span>
+      </div>
+      <div class="chart-container chart-container-large">
+        <canvas id="branchChart"></canvas>
+      </div>
+      <div id="chartLegend" class="chart-legend"></div>
+    </div>
+
+    <div class="panel strip-panel">
+      <div class="panel-header"><span class="panel-title">RISK STRIP — RECOMMENDED PATH</span></div>
+      <div id="riskStrip" class="risk-strip"></div>
+    </div>
+
+    <div class="panel clearance-panel">
+      <div class="panel-header"><span class="panel-title">AI RECOMMENDATION</span></div>
+      <div class="clearance-body">
+        <div class="clearance-badge" id="clearanceBadge">RECOMMENDED PATH</div>
+        <p id="explanationText" class="explanation-text"></p>
+      </div>
+      <div id="scenarioCards" class="scenario-cards"></div>
+    </div>
+
+    <!-- FEATURE 3b — Monte Carlo stress test for the RECOMMENDED scenario
+         above. Populated from a separate /api/montecarlo call, same pattern
+         as sensitivity below. Answers "given everything ELSE that could
+         plausibly happen too, how solid is this recommendation really?" -->
+    <div id="mcScenarioPanel" class="panel montecarlo-panel hidden">
+      <div class="panel-header">
+        <span class="panel-title">HOW SOLID IS THIS RECOMMENDATION?</span>
+        <span class="confidence-badge" id="mcScenarioBadge">--</span>
+      </div>
+      <p class="mc-explainer">
+        The chart above shows the recommended plan's cash trajectory as a single, certain line. We stress-tested
+        it <strong id="mcScenarioTrials">400</strong> times against realistic swings in growth, demand, costs, and
+        payment timing on top of that plan. <span id="mcScenarioHeadline"></span>
+      </p>
+      <div class="chart-container chart-container-medium">
+        <canvas id="mcScenarioChart"></canvas>
+      </div>
+      <div class="mc-legend">
+        <div class="mc-legend-item"><span class="mc-swatch mc-swatch-outer"></span>80% of outcomes fall in this range</div>
+        <div class="mc-legend-item"><span class="mc-swatch mc-swatch-inner"></span>50% of outcomes fall in this range</div>
+        <div class="mc-legend-item"><span class="mc-swatch mc-swatch-median"></span>Median (most likely) path</div>
+      </div>
+    </div>
+
+    <!-- FEATURE 1 — Sensitivity analysis. Populated from a separate
+         /api/sensitivity call for the recommended scenario. -->
+    <div id="sensitivityPanel" class="panel sensitivity-panel hidden">
+      <div class="panel-header">
+        <span class="panel-title">SENSITIVITY — WHAT MOVES THIS OUTCOME THE MOST</span>
+      </div>
+      <div class="chart-container chart-container-small">
+        <canvas id="sensitivityChart"></canvas>
+      </div>
+      <p class="sensitivity-note" id="sensitivitySkippedNote"></p>
+    </div>
+
+    <!-- AUDITABILITY — decision trace. Built entirely from fields already
+         present in the API response; nothing here is invented client-side. -->
+    <div class="panel trace-panel">
+      <div class="panel-header">
+        <span class="panel-title">HOW DID WE REACH THIS DECISION?</span>
+        <button type="button" id="shareBtn" class="reset-btn">🔗 Share this scenario</button>
+      </div>
+      <ol id="decisionTrace" class="decision-trace"></ol>
+      <p id="shareResult" class="extract-result"></p>
+    </div>
+
+  </section>
+
+  <section id="emptyState" class="empty-state">
+    <p>Select a business profile above, then ask a "what if" question — or switch to "What should I do?" — to see branching outcomes.</p>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <span>Deterministic financial engine · AI interprets &amp; explains, never calculates</span>
+</footer>
+
+<script src="vendor/chart.umd.min.js"></script>
+<script src="app.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>

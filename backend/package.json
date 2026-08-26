@@ -1,0 +1,15 @@
+{
+  "name": "financial-flight-simulator-backend",
+  "version": "1.0.0",
+  "description": "Deterministic financial engine + agentic what-if layer for the Financial Flight Simulator",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "express": "^4.22.2"
+  }
+}
