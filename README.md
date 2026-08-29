@@ -1,7 +1,7 @@
 # FinPilot — AI Financial Controller
 *(formerly "Financial Flight Simulator")*
 
-**Track:** AI Finance Controller — Razorpay Hackathon cum Hiring for AI Interns 2026
+**Track:** AI Finance Controller 
 
 Ask a plain-English financial question — *"I have ₹40L cash, revenue is
 growing 5%/mo, my biggest customer may pay 30 days late, and I want to hire
