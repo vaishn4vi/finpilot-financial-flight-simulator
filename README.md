@@ -2,6 +2,7 @@
 *(formerly "Financial Flight Simulator")*
 
 **Track:** AI Finance Controller 
+**🔗 Live demo:** https://finpilot-financial-flight-simulator-1.onrender.com
 
 Ask a plain-English financial question — *"I have ₹40L cash, revenue is
 growing 5%/mo, my biggest customer may pay 30 days late, and I want to hire
